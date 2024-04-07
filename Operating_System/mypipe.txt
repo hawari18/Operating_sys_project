@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void mypipe(char **input, char ***argv1, char ***argv2) {
+    int i;
+    int pipe_index = -1;
+
+    // Find the pipe '|' symbol in the input
+    for (i = 0; input[i] != NULL; i++) {
+        if (strcmp(input[i], "|") == 0) {
+            pipe_index = i;
+            break;
+        }
+    }
+
+    // If pipe not found, set both argv1 and argv2 to NULL
+    if (pipe_index == -1) {
+        *argv1 = NULL;
+        *argv2 = NULL;
+        return;
+    }
+
+    // Allocate memory for argv1
+    *argv1 = (char **)malloc((pipe_index + 1) * sizeof(char *));
+    if (*argv1 == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Allocate memory for argv2
+    *argv2 = (char **)malloc((i - pipe_index) * sizeof(char *));
+    if (*argv2 == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Copy strings to argv1
+    for (int j = 0; j < pipe_index; j++) {
+        (*argv1)[j] = strdup(input[j]);
+        if ((*argv1)[j] == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+    }
+    (*argv1)[pipe_index] = NULL; // Set last element to NULL
+
+    // Copy strings to argv2
+    for (int j = pipe_index + 1, k = 0; input[j] != NULL; j++, k++) {
+        (*argv2)[k] = strdup(input[j]);
+        if ((*argv2)[k] == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+    }
+    (*argv2)[i - pipe_index - 1] = NULL; // Set last element to NULL
+}
+
+int main() {
+    char input[1024];
+    char **argv1, **argv2;
+
+    printf("Enter input: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0'; // Remove trailing newline if exists
+
+    mypipe(input, &argv1, &argv2);
+
+    printf("argv1 = [");
+    for (int i = 0; argv1[i] != NULL; i++) {
+        printf("%s", argv1[i]);
+        if (argv1[i + 1] != NULL)
+            printf(", ");
+    }
+    printf("]\n");
+
+    printf("argv2 = [");
+    for (int i = 0; argv2[i] != NULL; i++) {
+        printf("%s", argv2[i]);
+        if (argv2[i + 1] != NULL)
+            printf(", ");
+    }
+    printf("]\n");
+
+    // Free allocated memory
+    for (int i = 0; argv1[i] != NULL; i++) {
+        free(argv1[i]);
+    }
+    free(argv1);
+    for (int i = 0; argv2[i] != NULL; i++) {
+        free(argv2[i]);
+    }
+    free(argv2);
+
+    return 0;
+}
+
+//התוכנית מקבלת קלט מהמשתמש ובודקת האם קיים בו תו '|'. אם כן, היא פורקת את הקלט לשני מערכים, אחד עם כל התתי מחרוזות מתחילת המערך עד לפני התו '|', והשני עם כל התתי מחרוזות מהתו '|' ועד סופו.//

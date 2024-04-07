@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void logout(char *str) {
+    // Remove leading and trailing whitespace
+    while (*str == ' ' || *str == '\t') {
+        str++;
+    }
+    char *end = str + strlen(str) - 1;
+    while (end > str && (*end == ' ' || *end == '\t')) {
+        end--;
+    }
+    *(end + 1) = '\0';
+
+    // Check if the string starts with "exit"
+    if (strncmp(str, "exit", 4) == 0) {
+        if (strlen(str) == 4 || *(str + 4) == '\0' || *(str + 4) == ' ') {
+            printf("Exiting terminal...\n");
+            exit(EXIT_SUCCESS);
+        }
+    }
+    printf("Invalid command: %s\n", str);
+}
+
+int main() {
+    char input1[] = "exit";
+    char input2[] = "  exit  ";
+    char input3[] = "exit 123";
+    char input4[] = "exit   hello";
+
+    logout(input1); // This should exit the terminal
+    logout(input2); // This should exit the terminal
+    logout(input3); // This should print "Invalid command: exit 123"
+    logout(input4); // This should print "Invalid command: exit   hello"
+
+    return 0;
+}

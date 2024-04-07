@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void move(char **args) {
+    // Check if arguments are provided
+    if (args[1] == NULL || args[2] == NULL) {
+        printf("Usage: move <source> <destination>\n");
+        return;
+    }
+
+    // Copy source and destination paths
+    char *source = args[1];
+    char *destination = args[2];
+
+    // Move file
+    if (rename(source, destination) != 0) {
+        perror("Error moving file");
+    } else {
+        printf("File moved successfully.\n");
+    }
+}
+
+int main(int argc, char *argv[]) {
+    move(argv);
+    return 0;
+}

@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void echoappend(char **args) {
+    // Check if arguments are provided
+    if (args[1] == NULL || args[2] == NULL) {
+        printf("Usage: echoappend <string> ≪ <path>\n");
+        return;
+    }
+
+    // Open file in append mode
+    FILE *file = fopen(args[2], "a");
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    // Write string to file
+    fprintf(file, "%s\n", args[1]);
+
+    // Close file
+    fclose(file);
+}
+
+int main(int argc, char *argv[]) {
+    echoappend(argv);
+    return 0;
+}

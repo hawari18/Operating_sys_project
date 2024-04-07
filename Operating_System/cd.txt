@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void cd(char **args) {
+    // Check if the second argument starts with a double quote
+    if (args[1][0] == '"') {
+        // Find the last argument that ends with a double quote
+        int i = 1;
+        while (args[i] != NULL && args[i][strlen(args[i]) - 1] != '"') {
+            i++;
+        }
+        if (args[i] == NULL) {
+            printf("Invalid path\n");
+            return;
+        }
+
+        // Concatenate all arguments from args[1] to args[i] into a single string
+        int total_length = 0;
+        for (int j = 1; j <= i; j++) {
+            total_length += strlen(args[j]);
+        }
+        char *path = malloc(total_length + 1); // +1 for the null terminator
+        if (path == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+        strcpy(path, args[1]);
+        for (int j = 2; j <= i; j++) {
+            strcat(path, " ");
+            strcat(path, args[j]);
+        }
+
+        // Change directory to the concatenated path
+        if (chdir(path) != 0) {
+            perror("cd");
+        }
+
+        // Free allocated memory
+        free(path);
+    } else {
+        // Change directory to the second argument
+        if (chdir(args[1]) != 0) {
+            perror("cd");
+        }
+    }
+}
+
+int main() {
+    // Example usage
+    char *args1[] = {"cd", "Documents", NULL};
+    char *args2[] = {"cd", "\"C:/Program Files\"", NULL};
+    cd(args1);
+    cd(args2);
+    return 0;
+}
+
+
+
+//תוכנית זו מקבלת מערך של מחרוזות כארגומנטים לפונקציה cd,  
+// ומבצעת שינוי תיקייה בהתאם למחרוזת המועברת כפרמטר. אם המחרוזת מתחילה בגרשיים כפולים (") ומסתיימת בגרשיים כפולים, התוכנית מחברת את כל המחרוזות מסביב לגרשיים למחרוזת אחת ומשנה את התיקייה לפי המחרוזת החדשה. אחרת, התוכנית משנה את התיקייה לפי המחרוזת הראשונה בלבד.

@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char** splitArguments(char* str) {
+    const char* delim = " ";
+    char* token;
+    int num_tokens = 0;
+
+    // Counting number of tokens
+    token = strtok(str, delim);
+    while (token != NULL) {
+        num_tokens++;
+        token = strtok(NULL, delim);
+    }
+
+    // Allocate memory for array of pointers to strings
+    char** arguments = malloc((num_tokens + 1) * sizeof(char*));
+    if (arguments == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Splitting the string and copying tokens to the array
+    token = strtok(str, delim);
+    for (int i = 0; i < num_tokens; i++) {
+        arguments[i] = strdup(token);
+        if (arguments[i] == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+        token = strtok(NULL, delim);
+    }
+
+    // Setting the last element to NULL
+    arguments[num_tokens] = NULL;
+
+    return arguments;
+}
+
+int main() {
+    char str[] = "cd OneDrive - Ariel University";
+    char** arguments = splitArguments(str);
+
+    // Printing the arguments
+    printf("Arguments = [");
+    for (int i = 0; arguments[i] != NULL; i++) {
+        printf("%s", arguments[i]);
+        if (arguments[i + 1] != NULL)
+            printf(", ");
+    }
+    printf("]\n");
+
+    // Freeing allocated memory
+    for (int i = 0; arguments[i] != NULL; i++) {
+        free(arguments[i]);
+    }
+    free(arguments);
+
+    return 0;
+}

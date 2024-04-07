@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void delete(char *str) {
+    // Check if the path contains quotes
+    int quoted = (str[0] == '"') && (str[strlen(str) - 1] == '"');
+
+    // Process the path to remove quotes
+    char processed_path[1024];
+    if (quoted) {
+        // Copy the path without the quotes
+        strncpy(processed_path, str + 1, strlen(str) - 2);
+        processed_path[strlen(str) - 2] = '\0';
+    } else {
+        // Copy the path as is
+        strcpy(processed_path, str);
+    }
+
+    // Delete the file
+    if (remove(processed_path) != 0) {
+        perror("Error deleting file");
+    }
+}
+
+int main() {
+    // Example usage
+    char *path1 = "file.txt";
+    char *path2 = "\"file with spaces.txt\"";
+    delete(path1);
+    delete(path2);
+    return 0;
+}
